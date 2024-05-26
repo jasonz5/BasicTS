@@ -125,6 +125,8 @@ BasicTS is built on PyTorch 1.9.1 or 1.10.0, while other versions have not been 
 - **Download Raw Data**
 
     You can download all the raw datasets at [Google Drive](https://drive.google.com/drive/folders/14EJVODCU48fGK0FkyeVom_9lETh80Yjp) or [Baidu Yun](https://pan.baidu.com/s/10gOPtlC9M4BEjx89VD1Vbw)(password: 6v0a), and unzip them to `datasets/raw_data/`.
+    
+    For datasets `{NYCBike1, NYCBike2, NYCTaxi, BJTaxi}`. You can download them from [ST-SSL](https://github.com/Echo-Ji/ST-SSL).
 
 - **Pre-process Data**
 

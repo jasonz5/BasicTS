@@ -11,7 +11,7 @@ from easytorch.utils.dist import master_only
 from .base_runner import BaseRunner
 from ..data import SCALER_REGISTRY
 from ..utils import load_pkl
-from ..metrics import masked_mae, masked_mape, masked_rmse, masked_wape, masked_mse
+from ..metrics import mae_torch, mape_torch, rmse_torch, masked_mae, masked_mape, masked_rmse, masked_wape, masked_mse
 
 
 class BaseTimeSeriesForecastingRunner(BaseRunner):
@@ -46,7 +46,10 @@ class BaseTimeSeriesForecastingRunner(BaseRunner):
         # define loss
         self.loss = cfg["TRAIN"]["LOSS"]
         # define metric
-        self.metrics = cfg.get("METRICS", {"MAE": masked_mae, "RMSE": masked_rmse, "MAPE": masked_mape, "WAPE": masked_wape, "MSE": masked_mse})
+        if self.dataset_name in ['NYCBike1', 'NYCBike2', 'NYCTaxi']:
+            self.metrics = cfg.get("METRICS", {"MAE": mae_torch, "RMSE": rmse_torch, "MAPE": mape_torch})
+        else:
+            self.metrics = cfg.get("METRICS", {"MAE": masked_mae, "RMSE": masked_rmse, "MAPE": masked_mape, "WAPE": masked_wape, "MSE": masked_mse})
         # TODO: use loss as the metric
         self.target_metrics = cfg.get("TARGET_METRICS", "MAE")
         # curriculum learning for output. Note that this is different from the CL in Seq2Seq archs.
@@ -361,6 +364,7 @@ class BaseTimeSeriesForecastingRunner(BaseRunner):
             cl_length = self.curriculum_learning(epoch=epoch)
             forward_return["prediction"] = forward_return["prediction"][:, :cl_length, :, :]
             forward_return["target"] = forward_return["target"][:, :cl_length, :, :]
+        # import ipdb; ipdb.set_trace()
         loss = self.metric_forward(self.loss, forward_return)
         # metrics
         for metric_name, metric_func in self.metrics.items():

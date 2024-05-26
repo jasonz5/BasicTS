@@ -16,6 +16,27 @@ def l2_loss(prediction: torch.Tensor, target: torch.Tensor, size_average: Option
 
     return F.mse_loss(prediction, target, size_average=size_average, reduce=reduce, reduction=reduction)
 
+def mae_torch(prediction: torch.Tensor, target: torch.Tensor, null_val: float = np.nan) -> torch.Tensor:
+    if null_val != None:
+        # import ipdb; ipdb.set_trace()
+        mask = torch.gt(target, null_val)
+        prediction = torch.masked_select(prediction, mask)
+        target = torch.masked_select(target, mask)
+    return torch.mean(torch.abs(target-prediction))
+
+def rmse_torch(prediction: torch.Tensor, target: torch.Tensor, null_val: float = np.nan) -> torch.Tensor:
+    if null_val != None:
+        mask = torch.gt(target, null_val)
+        prediction = torch.masked_select(prediction, mask)
+        target = torch.masked_select(target, mask)
+    return torch.sqrt(torch.mean(torch.square(target - prediction)))
+
+def mape_torch(prediction: torch.Tensor, target: torch.Tensor, null_val: float = np.nan) -> torch.Tensor:
+    if null_val != None:
+        mask = torch.gt(target, null_val)
+        prediction = torch.masked_select(prediction, mask)
+        target = torch.masked_select(target, mask)
+    return torch.mean(torch.abs(torch.div((target - prediction), target)))
 
 def masked_mae(prediction: torch.Tensor, target: torch.Tensor, null_val: float = np.nan) -> torch.Tensor:
     """Masked mean absolute error.

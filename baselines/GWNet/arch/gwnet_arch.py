@@ -64,7 +64,8 @@ class GraphWaveNet(nn.Module):
                     gcn_bool=True, addaptadj=True, aptinit=None,
                     in_dim=2, out_dim=12, residual_channels=32,
                     dilation_channels=32, skip_channels=256, end_channels=512,
-                    kernel_size=2, blocks=4, layers=2):
+                    kernel_size=2, blocks=4, layers=2, 
+                    linear_proj = False, linear_in = 2, linear_out = 2):
         super(GraphWaveNet, self).__init__()
         self.dropout = dropout
         self.blocks = blocks
@@ -150,6 +151,10 @@ class GraphWaveNet(nn.Module):
                                     bias=True)
 
         self.receptive_field = receptive_field
+        self.linear_proj = linear_proj
+        if self.linear_proj:
+            self.project = nn.Linear(linear_in, linear_out)
+        
 
     def forward(self, history_data: torch.Tensor, future_data: torch.Tensor, batch_seen: int, epoch: int, train: bool, **kwargs) -> torch.Tensor:
         """Feedforward function of Graph WaveNet.
@@ -226,4 +231,7 @@ class GraphWaveNet(nn.Module):
         x = F.relu(skip)
         x = F.relu(self.end_conv_1(x))
         x = self.end_conv_2(x)
+        # import ipdb;ipdb.set_trace()
+        if self.linear_proj:
+            x = self.project(x)
         return x
